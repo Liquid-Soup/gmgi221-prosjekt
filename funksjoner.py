@@ -2,7 +2,9 @@ import os
 import glob
 import geopandas as gpd
 import osmnx as ox
-
+import contextily as ctx
+import matplotlib.pyplot as plt
+import xyzservices.providers as xyz
 
 def bygg_graf(area_dict, network_type = "drive"):
     """
@@ -82,4 +84,49 @@ def beregn_gatetetthet(graf_dict, poly_dict):
     }
 
     return resultater
+
+def plot_gatetetthet(gatetetthet_dict, crs="EPSG:25833"):
+
+    """
+    Konverterer poly dict til geodataframe og plotter
+    """
+
+    to_plot = []
+
+    # iterer over gatetetthet dictionarien og henter ut navn, geometri og gattetetthet som dictionary
+    # og appender til to_plot
+    for navn, egenskaper in gatetetthet_dict.items():
+        to_plot.append({
+            "område": navn,
+            "geometry": egenskaper["polygon"]["geometry"],
+            "gatetetthet": egenskaper["gatetetthet"]
+        })
+
+    # konverterer to_plot til gdf, og setter utm crs for plotting
+    gdf = gpd.GeoDataFrame(to_plot, geometry="geometry", crs=crs)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    gdf.plot(
+        ax=ax,
+        column="gatetetthet",
+        cmap="viridis",  
+        edgecolor="black",
+        legend=True,
+        legend_kwds={
+            "label": "Gatetetthet (km vei per km²)"
+        }
+    )
+
+    ax.set_title("Gatetetthet for områder", fontsize=14)
+
+    ctx.add_basemap(
+        ax,
+        crs=gdf.crs,
+        source=xyz.OpenStreetMap.HOT
+    )
+
+    plt.tight_layout()
+    plt.show()
+
 
