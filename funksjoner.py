@@ -129,4 +129,23 @@ def plot_gatetetthet(gatetetthet_dict, crs="EPSG:25833"):
     plt.tight_layout()
     plt.show()
 
+def beregn_degree(grafer_dict):
+    """
+    Tar dict grafer og noder, returnerer en dict med stedsnavn og node degrees
+    """
+    # tom dictionary jeg skriver til
+    degree_dict = {}
+
+    # Iterer over hvert områdes graf 
+    # henter ut per område degree dict
+    for navn, graf in grafer_dict.items():
+        degree_dict[navn] = dict(graf.degree())
+    
+    return degree_dict
+
+def beregn_betweenness(grafer, edges_dict):
+    pass
+
+def bygg_indikator_tabell():
+    pass
 
